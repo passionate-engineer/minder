@@ -7,12 +7,12 @@ module.exports = class Server {
     const app = express();
 
     app.use((req, res, next) => {
-      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Origin", "minder.1day-release.cf");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       next();
     });
 
-    app.get('/', (req, res) => {
+    app.get('/api/keyword-tree', (req, res) => {
       // console.log(req.query.keyword);
       const keyword = req.query.keyword;
       if (!keyword) {
