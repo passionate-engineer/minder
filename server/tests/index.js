@@ -1,5 +1,5 @@
 // import Keyword from './keyword';
-const relatedKeyword = require('./related-keyword');
+const relatedKeyword = require('../modules/related-keyword');
 
 (async () => {
   // console.log(JSON.stringify(await relatedKeyword.getRelatedKeywords('テスト')));

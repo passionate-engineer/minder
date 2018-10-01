@@ -1,6 +1,4 @@
-// const puppeteer = require('puppeteer')
-// const express = require('express')
-// const http = require('http')
+const puppeteer = require('puppeteer')
 const fetch = require('node-fetch')
 
 module.exports = class Keyword {
@@ -28,12 +26,37 @@ module.exports = class Keyword {
       browser.close()
       return scrapingData
       */
+
+      /*
       const response = await fetch('https://qdjnvxwje1.execute-api.us-east-1.amazonaws.com/blue/keyword_ideas?query=' + encodeURIComponent(keyword) + '&language=ja&country=jp&google=http:%2F%2Fwww.google.com&service=0')
       const result = await response.json()
       let list = result.results.splice(1, 4)
       return list.map((value) => {
         return value.keyword
       })
+      */
+
+      // const browser = await puppeteer.launch({headless: false})
+      const browser = await puppeteer.launch({
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox'
+        ]
+      })
+      const page = await browser.newPage()
+      await page.goto('https://trends.google.co.jp/trends/?geo=JP')
+      await page.goto('https://trends.google.co.jp/trends/explore?date=all&geo=JP&q=' + keyword)
+      await page.waitForSelector('.fe-related-queries')
+      const scrapingData = await page.evaluate(async() => {
+        const dataList = []
+        const nodeList = document.querySelectorAll('.fe-related-queries .progress-label span')
+        nodeList.forEach(_node => {
+          dataList.push(_node.innerText.replace(/ - .*$/, '').trim())
+        })
+        return dataList
+      })
+      browser.close()
+      return scrapingData
     } catch (e) {
       return null
     }
