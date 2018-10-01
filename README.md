@@ -1,0 +1,2 @@
+# minder
+Automatically generate Mindmap.
