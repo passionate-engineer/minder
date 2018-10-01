@@ -1,3 +1,3 @@
-const server = new require('./server')
+const server = new require('./modules/server')
 
 server.start()
