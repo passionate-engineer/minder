@@ -1,9 +1,26 @@
 const puppeteer = require('puppeteer')
 const fetch = require('node-fetch')
 
+let browser
+let page
+
 module.exports = class Keyword {
+  static async openBrowser() {
+      browser = await puppeteer.launch({
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox'
+        ]
+      })
+      page = await browser.newPage()
+      await page.goto('https://trends.google.co.jp/trends/?geo=JP')
+  }
+
+  static async closeBrowser() {
+      browser.close()
+  }
+
   static async getRelatedKeywords(keyword) {
-    try {
       /*
       const browser = await puppeteer.launch({
         args: [
@@ -36,15 +53,6 @@ module.exports = class Keyword {
       })
       */
 
-      // const browser = await puppeteer.launch({headless: false})
-      const browser = await puppeteer.launch({
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox'
-        ]
-      })
-      const page = await browser.newPage()
-      await page.goto('https://trends.google.co.jp/trends/?geo=JP')
       await page.goto('https://trends.google.co.jp/trends/explore?date=all&geo=JP&q=' + keyword)
       await page.waitForSelector('.fe-related-queries')
       const scrapingData = await page.evaluate(async() => {
@@ -55,15 +63,12 @@ module.exports = class Keyword {
         })
         return dataList
       })
-      browser.close()
       return scrapingData
-    } catch (e) {
-      return null
-    }
   }
 
   static async getTree(keyword) {
     try {
+      await this.openBrowser()
       let tree = {keyword: keyword, children: []}
       const parentKeywords = await this.getRelatedKeywords(keyword)
       parentKeywords.splice(4)
@@ -76,6 +81,7 @@ module.exports = class Keyword {
           tree.children[parentIndex].children[childIndex] = {keyword: value, children: {}}
         })
       }
+      await this.closeBrowser()
       return tree
     } catch (e) {
       return null
