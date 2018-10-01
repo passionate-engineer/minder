@@ -499,14 +499,15 @@ const originMapData = [
   data () {
     return {
       keyword: '',
-      loading: false
+      loading: false,
+      bedforeKeyword: ''
     }
   },
   methods: {
     submit () {
-      if (this.keyword === '' || this.loading) return
+      if (this.beforeKeyword === this.keyword || this.keyword === '' || this.loading) return
       this.loading = true
-      fetch('http://163.44.171.245:8888/?keyword=' + encodeURIComponent(this.keyword))
+      fetch('/api/keyword-tree?keyword=' + encodeURIComponent(this.keyword))
         .then(response => response.json())
         .then(data => {
           const findObject = (array, key, value) => {
@@ -533,6 +534,7 @@ const originMapData = [
             "class": "go.TreeModel",
             "nodeDataArray": mapData
           }));
+          this.beforeKeyword = this.keyword
           this.loading = false
         })
     }
