@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mind Map</title>
+<title>Minder</title>
 <meta name="description" content="A mind map editor, showing how subtrees can be moved, copied, deleted, and laid out." />
 <!-- Copyright 1998-2018 by Northwoods Software Corporation. -->
 <meta charset="UTF-8">
@@ -284,9 +284,13 @@
 </head>
 <body onload="init()">
 <div id="app">
-  <p>キーワードを入力してEnterを押すと、自動でマインドマップが生成されます。</p>
-  <p>Keyword: <input placeholder="マインドマップ" v-model="keyword" @keydown.enter="submit"><img src="http://sozai.7gates.net/img/icon/loading/loading01_r3_c1.gif" v-show="loading"></p>
-  <div id="myDiagramDiv" style="border: solid 1px black; width:100%; height:300px;"></div>
+  <p>
+・キーワードを入力してEnterを押すと、自動でマインドマップが生成されます。<br>
+・構築処理には20秒ほどかかります。<br>
+・現状は固定数の算出のみとなります。
+  </p>
+  <p><input placeholder="起点となるキーワードを入力" v-model="keyword" @keydown.enter="submit" style="font-size: 14px; width:200px;"><img src="http://sozai.7gates.net/img/icon/loading/loading01_r3_c1.gif" v-show="loading" style="margin-left: 5px; vertical-align: bottom;"></p>
+  <div id="myDiagramDiv" style="width:100vw; height:80vh;"></div>
 
 
   <!--
