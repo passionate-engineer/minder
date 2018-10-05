@@ -53,7 +53,7 @@ module.exports = class Keyword {
       })
       */
 
-      await page.goto('https://trends.google.co.jp/trends/explore?date=all&geo=JP&q=' + keyword)
+      await page.goto('https://trends.google.co.jp/trends/explore?date=all&gprop=youtube&geo=JP&q=' + keyword)
       await page.waitForSelector('.fe-related-queries')
       const scrapingData = await page.evaluate(async() => {
         const dataList = []
