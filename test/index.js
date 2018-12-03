@@ -9,9 +9,8 @@ const RelatedKeyword = require('../lib/related-keyword');
 const relatedKeyword = new RelatedKeyword();
 
 (async () => {
-  console.log(
-    JSON.stringify(await relatedKeyword.getRelatedKeywords('テスト'))
-  );
+  // console.log(await relatedKeyword.getKeywords('筋肉'));
+  // console.log(await relatedKeyword.getKeywords('テスト'));
 })();
 
 (async () => {

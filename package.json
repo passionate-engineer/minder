@@ -4,17 +4,20 @@
   "description": "minder",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node index.js 8888 minder.1day-release.cf",
     "deploy": "ssh conoha-develop 'forever stop /root/minder/app.js'; rsync -rv --delete --exclude=node_modules ./ conoha-develop:/root/minder; ssh conoha-develop 'npm --prefix /root/minder install /root/minder'; ssh conoha-develop 'forever start /root/minder/app.js'",
     "test": "nodemon test/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.368.0",
     "express": "^4.16.3",
+    "express-cluster": "0.0.5",
     "http": "0.0.0",
     "node-fetch": "^2.2.0",
-    "puppeteer": "^1.8.0"
+    "puppeteer": "^1.8.0",
+    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "jest": "^23.6.0"
