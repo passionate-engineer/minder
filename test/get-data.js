@@ -35,7 +35,7 @@ const autoPutItem = () => {
 
   dynamodb.getItem(params, async (err, res) => {
     // console.log(res);
-    if (res && !res.Item) {
+    if ((res && !res.Item) || count === 0) {
       const relatedKeywords = await relatedKeyword.getKeywords(keyword);
 
       const putRelatedKeywords = JSON.stringify(
