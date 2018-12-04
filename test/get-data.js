@@ -24,7 +24,7 @@ let count = 0;
 const autoPutItem = () => {
   const keyword = stack[0];
   if (++count > 10000) return;
-  console.log(count + ':' + keyword);
+  console.log(count + ':' + keyword + ':' + String(new Date()).slice(16, 24));
 
   let params = {
     TableName: 'minder',
