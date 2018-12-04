@@ -21,10 +21,20 @@ function shuffle(a) {
 
 let stack = [process.argv[2]];
 let count = 0;
+let duplicate = 0;
 const autoPutItem = () => {
   const keyword = stack[0];
   if (++count > 10000) return;
-  console.log(count + ':' + keyword + ':' + String(new Date()).slice(16, 24));
+  console.log(
+    count +
+      ':' +
+      keyword +
+      ' ' +
+      String(new Date()).slice(16, 24) +
+      ' ' +
+      (duplicate > 0 ? Math.floor((duplicate / count) * 100) : 0) +
+      '%'
+  );
 
   let params = {
     TableName: 'minder',
@@ -68,6 +78,7 @@ const autoPutItem = () => {
       });
     } else {
       console.log('重複');
+      duplicate++;
       shuffle(stack);
       autoPutItem();
     }
