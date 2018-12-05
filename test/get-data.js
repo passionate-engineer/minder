@@ -1,5 +1,6 @@
 /*!
  * minder
+ * node get-data.js slackWebsocketURL loopMax waitTime
  * Copyright(c) 2018 Passionate Engineer Ryoju
  */
 
@@ -15,6 +16,10 @@ const webhook = new IncomingWebhook(process.argv[2]);
 
 const RelatedKeyword = require('../lib/related-keyword');
 const relatedKeyword = new RelatedKeyword();
+
+const loopMax = process.argv[3] ? process.argv[3] : 5000;
+const waitTime = process.argv[4] ? process.argv[4] : 0;
+const tableName = 'minder_full';
 
 const shuffle = a => {
   for (let i = a.length - 1; i > 0; i--) {
@@ -48,81 +53,87 @@ const complete = () => {
 };
 
 const autoPutItem = keyword => {
-  if (++loopCount > 10000) {
-    complete();
-    return;
-  }
-
-  console.log(
-    count +
-      1 +
-      ':' +
-      keyword +
-      ' ' +
-      String(new Date()).slice(16, 24) +
-      ' ' +
-      duplicate +
-      '/' +
-      count
-  );
-
-  let params = {
-    TableName: 'minder',
-    Key: {
-      keyword: { S: keyword }
+  setTimeout(() => {
+    if (++loopCount > loopMax) {
+      complete();
+      return;
     }
-  };
 
-  dynamodb.getItem(params, async (err, res) => {
-    if ((res && !res.Item) || count === 0) {
-      // Timeout
-      timeout = setTimeout(() => {
-        complete();
-      }, 60000);
-      const relatedKeywords = await relatedKeyword.getKeywords(keyword);
-      clearTimeout(timeout);
+    console.log(
+      count +
+        1 +
+        ':' +
+        keyword +
+        ' ' +
+        String(new Date()).slice(16, 24) +
+        ' ' +
+        duplicate +
+        '/' +
+        count
+    );
 
-      const putRelatedKeywords = JSON.stringify(
-        relatedKeywords.map(keyword => {
-          return [keyword.keyword, keyword.value];
-        })
-      );
+    let params = {
+      TableName: tableName,
+      Key: {
+        keyword: { S: keyword }
+      }
+    };
 
-      params = {
-        TableName: 'minder',
-        Item: {
-          keyword: { S: keyword },
-          related_keywords: { S: putRelatedKeywords }
-        }
-      };
+    dynamodb.getItem(params, async (err, res) => {
+      if ((res && !res.Item) || count === 0) {
+        // Timeout
+        timeout = setTimeout(() => {
+          complete();
+        }, 60000);
+        const relatedKeywords = await relatedKeyword.getKeywords(keyword);
+        clearTimeout(timeout);
 
-      dynamodb.putItem(params, (err, data) => {
-        if (err) {
-          console.log(err, err.stack);
-        } else {
-          count++;
-          relatedKeywords.forEach(relatedKeyword => {
-            stack.push(relatedKeyword.keyword);
-          });
-          stack.shift();
-          shuffle(stack);
-          stack.splice(100);
-          autoPutItem(stack[0]);
-        }
-      });
-    } else {
-      console.log('重複');
-      duplicate++;
-      shuffle(stack);
-      autoPutItem(stack[0]);
-    }
-  });
+        let putRelatedKeywords = '';
+        relatedKeywords.forEach(keyword => {
+          putRelatedKeywords += keyword.keyword + ':' + keyword.value + ',';
+        });
+        putRelatedKeywords = putRelatedKeywords.slice(
+          0,
+          putRelatedKeywords.length - 1
+        );
+
+        params = {
+          TableName: tableName,
+          Item: {
+            keyword: { S: keyword },
+            related_keywords: { S: putRelatedKeywords }
+          }
+        };
+
+        if (!putRelatedKeywords) delete params.Item.related_keywords;
+
+        dynamodb.putItem(params, (err, data) => {
+          if (err) {
+            console.log(err, err.stack);
+          } else {
+            count++;
+            relatedKeywords.forEach(relatedKeyword => {
+              stack.push(relatedKeyword.keyword);
+            });
+            stack.shift();
+            shuffle(stack);
+            stack.splice(100);
+            autoPutItem(stack[0]);
+          }
+        });
+      } else {
+        duplicate++;
+        shuffle(stack);
+        autoPutItem(stack[0]);
+      }
+    });
+  }, waitTime);
 };
 
 // autoPutItem();
 const randomKeyword = callback => {
   let params = {
-    TableName: 'minder',
+    TableName: tableName,
     Limit: 1000
   };
 
@@ -130,8 +141,12 @@ const randomKeyword = callback => {
     if (err) {
       console.log(err, err.stack);
     } else {
-      const randNum = Math.floor(Math.random() * 1000);
-      callback(res.Items[randNum].keyword.S);
+      if (res.Items.length >= 1000) {
+        const randNum = Math.floor(Math.random() * 1000);
+        callback(res.Items[randNum].keyword.S);
+      } else {
+        callback('筋肉');
+      }
     }
   });
 };
