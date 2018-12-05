@@ -11,7 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@slack/client": "^4.8.0",
     "aws-sdk": "^2.368.0",
+    "exec": "^0.2.1",
     "express": "^4.16.3",
     "express-cluster": "0.0.5",
     "http": "0.0.0",
