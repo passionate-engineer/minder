@@ -141,12 +141,8 @@ const randomKeyword = callback => {
     if (err) {
       console.log(err, err.stack);
     } else {
-      if (res.Items.length >= 1000) {
-        const randNum = Math.floor(Math.random() * 1000);
-        callback(res.Items[randNum].keyword.S);
-      } else {
-        callback('筋肉');
-      }
+      const randNum = Math.floor(Math.random() * 1000);
+      callback(res.Items[randNum].keyword.S);
     }
   });
 };
