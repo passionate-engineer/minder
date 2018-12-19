@@ -117,7 +117,7 @@ const autoPutItem = keyword => {
             });
             stack.shift();
             shuffle(stack);
-            stack.splice(100);
+            stack.splice(1000);
             autoPutItem(stack[0]);
           }
         });
@@ -131,22 +131,33 @@ const autoPutItem = keyword => {
 };
 
 // autoPutItem();
-const randomKeyword = callback => {
+const randomKeywords = callback => {
   let params = {
     TableName: tableName,
-    Limit: 1000
+    Limit: 10000
   };
 
   dynamodb.scan(params, async (err, res) => {
     if (err) {
       console.log(err, err.stack);
     } else {
-      const randNum = Math.floor(Math.random() * 1000);
-      callback(res.Items[randNum].keyword.S);
+      let stack = [];
+      for (var i = 0; i < 10000; i++) {
+        // const randNum = Math.floor(Math.random() * 10000);
+        if (res.Items[i] && res.Items[i].related_keywords) {
+          stack.push(res.Items[i].keyword.S);
+        }
+      }
+      callback(stack)
     }
   });
 };
 
-randomKeyword(keyword => {
-  autoPutItem(keyword);
+randomKeywords(keywords => {
+  stack = keywords
+  stack.shift();
+  shuffle(stack);
+  stack.splice(1000);
+
+  autoPutItem(stack[0]);
 });
